@@ -1,29 +1,36 @@
 import maya.cmds as cmds
 
 
-def create_control_for_joints(joint_names):
-    for joint_name in joint_names:
-        # Create a NURBS circle control at the joint's position
-        control_name = joint_name + "_ctrl"
-        control = cmds.circle(n=control_name, nr=(0, 1, 0))[0]  # nr specifies the normal direction for the circle
+def create_controls_for_joints():
+    # Get the currently selected joints
+    selected_joints = cmds.ls(selection=True, type='joint')
+    if not selected_joints:
+        cmds.warning("Please select at least one joint.")
+        return
 
-        # Get the joint's position
-        position = cmds.xform(joint_name, q=True, ws=True, t=True)
+    for joint in selected_joints:
+        # Determine the base name by stripping "_Jnt" or similar suffix if exists
+        base_name = joint.rsplit('_', 1)[0] if '_' in joint else joint
 
-        # Create an empty group at the joint's position
-        group_name = joint_name + "_grp"
-        group = cmds.group(em=True, n=group_name)
+        # Create a NURBS circle
+        control_name = base_name + '_Ctrl'
+        group_name = base_name + '_Ctrl_Grp'
+        control = cmds.circle(name=control_name, normal=[0, 1, 0], radius=1.0)[0]
 
-        # Move the group to the joint's position
-        cmds.xform(group, ws=True, t=position)
+        # Group the control
+        group = cmds.group(control, name=group_name)
 
-        # Parent the control under the group
-        cmds.parent(control, group)
+        # Match the group's transformation to the joint
+        cmds.delete(cmds.parentConstraint(joint, group))
+        cmds.delete(cmds.scaleConstraint(joint, group))
 
-        # match the joint's orientation to the control
-        cmds.xform(control, ws=True, t=position)
+        # Rename the group and control to match the new naming convention
+        cmds.rename(group, group_name)
+        cmds.rename(control, control_name)
+
+        # Print control and group names for confirmation
+        print("Created Control: {}, Group: {}".format(control, group))
 
 
-# Get all selected joints in the scene
-selected_joints = cmds.ls(sl=True, type='joint')
-create_control_for_joints(selected_joints)
+# Run the function
+create_controls_for_joints()

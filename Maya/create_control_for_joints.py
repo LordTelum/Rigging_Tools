@@ -1,6 +1,5 @@
 import maya.cmds as cmds
 
-
 def create_controls_for_joints():
     # Get the currently selected joints
     selected_joints = cmds.ls(selection=True, type='joint')
@@ -9,8 +8,12 @@ def create_controls_for_joints():
         return
 
     for joint in selected_joints:
-        # Determine the base name by stripping "_Jnt" or similar suffix if exists
-        base_name = joint.rsplit('_', 1)[0] if '_' in joint else joint
+        print("Processing joint: {}".format(joint))  # Debug: print the joint being processed
+        # Split the full path and use only the last part for base_name
+        joint_name_parts = joint.split('|')
+        last_part = joint_name_parts[-1]  # Get the last part of the hierarchy
+        base_name = last_part.rsplit('_', 1)[0] if '_' in last_part else last_part
+        print("Base name: {}".format(base_name))  # Debug: print the base name derived
 
         # Create a NURBS circle
         control_name = base_name + '_Ctrl'
@@ -30,7 +33,6 @@ def create_controls_for_joints():
 
         # Print control and group names for confirmation
         print("Created Control: {}, Group: {}".format(control, group))
-
 
 # Run the function
 create_controls_for_joints()

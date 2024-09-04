@@ -14,12 +14,13 @@ for index in range(0, len(sels) - 1, 1):
     s_constraint = cmds.scaleConstraint(parent_ctrl, child_ctrl_grp, mo=True, weight=1)[0]  # constrain scale
 
     # adding custom attributes
-    cmds.addAttr(child_ctrl, ln="Follow_Translate", at="double", min=0, max=1, dv=1)
-    cmds.setAttr(f"{child_ctrl}.Follow_Translate", e=True, keyable=True)
-    cmds.addAttr(child_ctrl, ln="Follow_Rotate", at="double", min=0, max=1, dv=1)
-    cmds.setAttr(f"{child_ctrl}.Follow_Rotate", e=True, keyable=True)
+    cmds.addAttr(child_ctrl, ln="FollowTranslate", at="double", min=0, max=1, dv=1)
+    cmds.setAttr(f"{child_ctrl}.FollowTranslate", e=True, keyable=True)
+    cmds.addAttr(child_ctrl, ln="FollowRotate", at="double", min=0, max=1, dv=1)
+    cmds.setAttr(f"{child_ctrl}.FollowRotate", e=True, keyable=True)
 
     # connecting custom attributes to parent constraints
-    cmds.connectAttr(f"{child_ctrl}.Follow_Translate", f"{p_constraint1}.w0", f=True)
-    cmds.connectAttr(f"{child_ctrl}.Follow_Rotate", f"{p_constraint2}.w0", f=True)
-    cmds.connectAttr(f"{child_ctrl}.Follow_Rotate", f"{p_constraint2}.w0", f=True)
+    follow_translate_attr = f"{child_ctrl}.FollowTranslate"
+    follow_rotate_attr = f"{child_ctrl}.FollowRotate"
+    translate_weight_attr = f"{p_constraint1}.{parent_ctrl}W0"
+    rotate_weight_attr = f"{p_constraint2}.{parent_ctrl}W0"

@@ -73,7 +73,6 @@ class DrivenKeyUI:
         driver_attr = cmds.textScrollList(self.driver_attr_list, query=True, selectItem=True)
         driven_attr = cmds.textScrollList(self.driven_attr_list, query=True, selectItem=True)
 
-
         if not driver_attr or not driven_attr:
             cmds.warning("Please select attributes for both the driver and driven.")
             return
@@ -98,15 +97,15 @@ class DrivenKeyUI:
         cmds.setDrivenKeyframe(self.driven + '.' + driven_attr, cd=self.driver + '.' + driver_attr,
                                driverValue=driver_pos, value=driven_pos)
 
-        # Set tangents and infinity options
-        for time in [driver_neg, driver_zero, driver_pos]:
-            cmds.selectKey(self.driven + '.' + driven_attr, time=(time, time))
+        # Force update tangents and infinity options by re-selecting driven keys
+        for driver_value in [driver_neg, driver_zero, driver_pos]:
+            cmds.selectKey(self.driven + '.' + driven_attr, attribute=driven_attr, time=(driver_value,))
             cmds.keyTangent(inTangentType='spline', outTangentType='spline')
             cmds.setInfinity(self.driven + '.' + driven_attr, preInfinite='linear', postInfinite='linear')
 
         # Clear selection and display success message
         cmds.select(clear=True)
-        cmds.inViewMessage(amg='Driven Keys Set!', pos='topCenter', fade=True)
+        cmds.inViewMessage(amg='Driven Keys Set with tangents!', pos='topCenter', fade=True)
 
     def open_graph_editor(self, *args):
         # Select the driven object
